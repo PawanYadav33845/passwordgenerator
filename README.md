@@ -1,13 +1,20 @@
 # ⚡ CYBERVAULT v2.0
 > **Sci-Fi Cyberpunk Password Generator & Encrypted Vault (Desktop + Web Version)**
 
-CYBERVAULT is an all-in-one security suite available as both a **Desktop Application (Python/CustomTkinter)** and a **Web Application (HTML5/JavaScript Web-Crypto API)** ready for 1-click hosting on **Netlify**.
+[![Live Demo](https://img.shields.io/badge/LIVE_DEMO-NETLIFY-00F0FF?style=for-the-badge&logo=netlify)](https://passwordmngen.netlify.app/)
+
+CYBERVAULT is an all-in-one security suite available as both a **Desktop Application (Python/CustomTkinter)** and a **Web Application (HTML5/JavaScript Web-Crypto API)**.
+
+🔗 **Live Web Demo**: [https://passwordmngen.netlify.app/](https://passwordmngen.netlify.app/)
 
 ---
 
-## 🌐 Web Version (Netlify Ready)
+## 🌐 Web Version
 
-The Web version of CYBERVAULT runs 100% client-side inside the browser using modern cryptographic standards:
+The Web version of CYBERVAULT runs 100% client-side inside the browser using modern cryptographic standards.
+
+### 🌐 Live Web Demo
+👉 **[https://passwordmngen.netlify.app/](https://passwordmngen.netlify.app/)**
 
 ### Key Web Features
 - **Client-Side Web Crypto API**: Encrypts and decrypts credentials directly in the browser using **AES-256-GCM** with a **PBKDF2-SHA256** derived key (200,000 iterations).
@@ -15,18 +22,6 @@ The Web version of CYBERVAULT runs 100% client-side inside the browser using mod
 - **Entropy & Strength Meter**: Calculates bit entropy ($E = L \times \log_2(N)$) and assigns live ratings (`WEAK`, `MEDIUM`, `STRONG`, `OVERKILL`).
 - **Encrypted Web Vault**: Stores credentials encrypted in `localStorage` or exports to encrypted `.cybervault` bundle files.
 - **Clipboard Protection**: 30-second automated clipboard auto-clear timer with visual countdown.
-
-### 🚀 How to Deploy on Netlify
-
-1. **Option 1: Netlify Drag & Drop**:
-   - Go to [Netlify Drop](https://app.netlify.com/drop).
-   - Drag and drop your `password-generator` project folder.
-   - Netlify will instantly build and host your site with HTTPS!
-
-2. **Option 2: Netlify CLI / GitHub Integration**:
-   - Push your project repository to GitHub.
-   - Link the repository in Netlify.
-   - Netlify automatically detects `netlify.toml` and publishes the static site root (`/`).
 
 ---
 
@@ -69,5 +64,5 @@ password-generator/
 │   ├── backup_manager.py       # Encrypted JSON & CSV import/export manager
 │   └── gui/                    # CustomTkinter GUI components
 ├── requirements.txt            # Desktop Python dependencies
-└── README.md                   # System documentation & deployment guide
+└── README.md                   # System documentation & live demo link
 ```
