@@ -1,98 +1,73 @@
 # ⚡ CYBERVAULT v2.0
-> **Sci-Fi Cyberpunk Password Generator & Encrypted Vault Manager**
+> **Sci-Fi Cyberpunk Password Generator & Encrypted Vault (Desktop + Web Version)**
 
-CYBERVAULT is an all-in-one desktop security application built in Python using CustomTkinter. It features a futuristic Cyberpunk HUD interface, cryptographically secure password generation (CSPRNG), and authenticated AES-256 (Fernet) field-level encryption combined with PBKDF2-HMAC-SHA256 key derivation for all stored database records.
-
----
-
-## 🔒 Zero-Knowledge Security & Master Password Protection
-
-### Zero-Knowledge Architecture
-- **Zero Plaintext Secret Storage**: Master passwords are **never stored anywhere** on disk, in source code, in config files, or in comments.
-- **Adaptive One-Way Hashing**: Verification uses salted `bcrypt` hashes. It is mathematically impossible to reverse-engineer or extract the master password from application files or commands.
-- **Dynamic RAM-Only Key Derivation**: The 256-bit AES encryption key is derived dynamically in memory at runtime via **PBKDF2-HMAC-SHA256** (200,000 iterations) using your entered Master Password + salt. Upon locking the vault or closing the application, all key material is immediately purged from RAM.
+CYBERVAULT is an all-in-one security suite available as both a **Desktop Application (Python/CustomTkinter)** and a **Web Application (HTML5/JavaScript Web-Crypto API)** ready for 1-click hosting on **Netlify**.
 
 ---
 
-## 🌐 Multi-Device Access & Vault Synchronization
+## 🌐 Web Version (Netlify Ready)
 
-CYBERVAULT supports two secure methods for multi-device cross-platform synchronization:
+The Web version of CYBERVAULT runs 100% client-side inside the browser using modern cryptographic standards:
 
-### Method A: Cloud Drive / Shared Folder Auto-Sync (Recommended)
-1. Store or copy the `data/` folder (`config.json` and `vault.db`) to your preferred cloud drive directory (e.g., OneDrive, Google Drive, Dropbox, iCloud, or a USB flash drive).
-2. Install CYBERVAULT on your second PC or laptop and copy/link the `data/` folder there.
-3. Launch `python passwrdmngr.py` on any device and enter your Master Password. All database updates sync seamlessly across devices.
+### Key Web Features
+- **Client-Side Web Crypto API**: Encrypts and decrypts credentials directly in the browser using **AES-256-GCM** with a **PBKDF2-SHA256** derived key (200,000 iterations).
+- **CSPRNG Password Generator**: Uses `window.crypto.getRandomValues()` for true cryptographic entropy.
+- **Entropy & Strength Meter**: Calculates bit entropy ($E = L \times \log_2(N)$) and assigns live ratings (`WEAK`, `MEDIUM`, `STRONG`, `OVERKILL`).
+- **Encrypted Web Vault**: Stores credentials encrypted in `localStorage` or exports to encrypted `.cybervault` bundle files.
+- **Clipboard Protection**: 30-second automated clipboard auto-clear timer with visual countdown.
 
-### Method B: Portable `.cybervault` Encrypted Bundle Export
-1. In CYBERVAULT, navigate to the **BACKUP & SETTINGS** tab.
-2. Click **EXPORT PORTABLE VAULT (.cybervault)**.
-3. Move the `.cybervault` bundle file to your second device via email, USB stick, or secure transfer.
-4. On the second device, launch CYBERVAULT and click **IMPORT PORTABLE VAULT (.cybervault)** to import all encrypted records!
+### 🚀 How to Deploy on Netlify
 
----
+1. **Option 1: Netlify Drag & Drop**:
+   - Go to [Netlify Drop](https://app.netlify.com/drop).
+   - Drag and drop your `password-generator` project folder.
+   - Netlify will instantly build and host your site with HTTPS!
 
-## 🛡️ Database Encryption Specification
-
-1. **Master Key Derivation (PBKDF2-HMAC-SHA256)**:
-   - Uses a unique 16-byte random salt stored per-vault.
-   - Derives a 256-bit encryption key from your Master Password using 200,000 PBKDF2 hashing iterations.
-
-2. **Database Field Encryption**:
-   - SQLite Database (`data/vault.db`) stores **zero plaintext user data**.
-   - All columns (`website`, `username`, `password`, `category`, `notes`) are encrypted with AES-256 (Fernet cipher tokens) prior to insertion into the database.
-   - Includes an encrypted verification **canary token** in `data/config.json` to validate master key integrity upon login.
-
-3. **Cryptographic Password Generation (CSPRNG)**:
-   - Uses Python's `secrets` library to ensure true cryptographic entropy for generated passwords.
-   - Computes real-time password entropy in bits ($E = L \times \log_2(N)$).
-
-4. **Memory & Clipboard Sanitization**:
-   - Automatic **30-second Clipboard Auto-Clear Timer** to wipe copied passwords from system memory.
+2. **Option 2: Netlify CLI / GitHub Integration**:
+   - Push your project repository to GitHub.
+   - Link the repository in Netlify.
+   - Netlify automatically detects `netlify.toml` and publishes the static site root (`/`).
 
 ---
 
-## 🎨 Sci-Fi GUI Features
+## 🖥️ Desktop Version (`main.py`)
 
-- **Cyberpunk HUD Aesthetics**: High-contrast dark void background (`#090C15`) with Cyber Cyan (`#00F0FF`), Holo Green (`#00FF66`), and Plasma Red (`#FF2A6D`) UI accents.
-- **Real-Time Telemetry Bar**: Shows active cipher parameters (`AES-256-Fernet | PBKDF2-SHA256`), clipboard countdown status, and one-click vault locking.
-- **Password Strength & Entropy Visualizer**: Displays live bit-entropy calculations (`WEAK`, `MEDIUM`, `STRONG`, `OVERKILL`).
-- **Security Audit Dashboard**: Automatically scans vault entries for weak passwords (< 50 bits entropy) and password reuse across services.
+### 🔑 Master Password & Security Model
+- **Zero-Knowledge Architecture**: Master passwords are never stored on disk or in source code.
+- **PBKDF2-HMAC-SHA256 Key Derivation**: 256-bit AES encryption key derived at runtime.
+- **Field-Level Encryption**: All SQLite `vault.db` entries (`website`, `username`, `password`, `category`, `notes`) are encrypted with AES-256 (Fernet) prior to database insertion.
+
+### 🚀 How to Run Desktop App
+
+```bash
+# 1. Install Python dependencies
+pip install -r requirements.txt
+
+# 2. Launch Desktop Application
+python main.py
+```
 
 ---
 
-## 📁 Project Architecture
+## 📁 Project Directory Architecture
 
 ```
-password generator/
-├── data/                       # Application data & encrypted database
-│   ├── config.json             # Salt, bcrypt master hash & encrypted canary token
-│   └── vault.db                # Encrypted SQLite credential database
-├── src/                        # Source modules
+password-generator/
+├── index.html                  # Cyberpunk Web Interface
+├── styles.css                  # Sci-Fi Cyberpunk CSS styling & animations
+├── app.js                      # Client-Side Web Crypto API controller
+├── netlify.toml                # Netlify deployment configuration
+├── main.py                     # Desktop Application Entry Point
+├── data/                       # Local desktop storage directory
+│   ├── config.json             # Salt & bcrypt master hash
+│   └── vault.db                # Encrypted SQLite database
+├── src/                        # Desktop Python source modules
 │   ├── __init__.py
 │   ├── crypto_engine.py        # PBKDF2 key derivation & Fernet cipher engine
 │   ├── generator.py            # CSPRNG password generator & entropy calculator
 │   ├── database.py             # Encrypted SQLite database layer
 │   ├── backup_manager.py       # Encrypted JSON & CSV import/export manager
 │   └── gui/                    # CustomTkinter GUI components
-│       ├── __init__.py
-│       ├── theme.py            # Sci-Fi color palette & typography
-│       ├── auth_window.py      # Master Password authentication window
-│       └── main_window.py      # Main Vault, Generator & Audit interface
-├── passwrdmngr.py              # Primary Application Entry Point
-├── requirements.txt            # Project dependencies
-└── README.md                   # System documentation & security report
+├── requirements.txt            # Desktop Python dependencies
+└── README.md                   # System documentation & deployment guide
 ```
-
----
-
-## 🚀 How to Run
-
-1. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Launch Application**:
-   ```bash
-   python passwrdmngr.py
-   ```

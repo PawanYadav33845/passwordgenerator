@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBERVAULT // Sci-Fi Cryptographic Web Vault & Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="cyber-bg"></div>
+    <div class="cyber-grid"></div>
+
+    <!-- AUTH GATEWAY MODAL (LOCKED STATE) -->
+    <div id="auth-gateway" class="gateway-overlay">
+        <div class="cyber-card auth-card">
+            <div class="corner-border top-left"></div>
+            <div class="corner-border top-right"></div>
+            <div class="corner-border bottom-left"></div>
+            <div class="corner-border bottom-right"></div>
+            
+            <div class="glitch-title" data-text="CYBERVAULT">CYBERVAULT</div>
+            <div class="auth-subtitle">[ SECURITY GATEWAY v2.0 // WEB-CRYPTO ]</div>
+            
+            <div id="auth-badge" class="badge badge-green">● AUTHENTICATION REQUIRED</div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group">
+                    <label id="auth-label" for="master-password-input">ENTER MASTER PASSWORD:</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="master-password-input" autocomplete="current-password" placeholder="••••••••••••••••" required>
+                        <button type="button" class="btn-toggle-eye" onclick="toggleAuthEye()">👁️</button>
+                    </div>
+                </div>
+
+                <div id="confirm-pass-group" class="form-group hidden">
+                    <label for="confirm-password-input">CONFIRM MASTER PASSWORD:</label>
+                    <input type="password" id="confirm-password-input" autocomplete="new-password" placeholder="••••••••••••••••">
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="cyber-button btn-cyan">
+                    <span class="btn-glitch"></span>UNLOCK VAULT
+                </button>
+            </form>
+
+            <div class="auth-footer-note">
+                AES-GCM 256-BIT | PBKDF2-SHA256 (200K ITERATIONS) | ZERO-KNOWLEDGE
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP INTERFACE (UNLOCKED STATE) -->
+    <div id="app-container" class="app-container hidden">
+        <!-- TOP HUD BAR -->
+        <header class="hud-bar">
+            <div class="hud-left">
+                <span class="hud-logo">CYBERVAULT</span>
+                <span class="hud-badge">● VAULT UNLOCKED</span>
+                <span class="hud-cipher">[ WEB-CRYPTO: AES-256-GCM | PBKDF2-SHA256 ]</span>
+            </div>
+            <div class="hud-right">
+                <span id="clipboard-timer" class="clipboard-badge"></span>
+                <button class="cyber-button btn-red btn-sm" onclick="lockVault()">🔒 LOCK VAULT</button>
+            </div>
+        </header>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('vault-tab', this)">🗄️ CREDENTIALS VAULT</button>
+            <button class="tab-btn" onclick="switchTab('generator-tab', this)">⚡ PASSWORD GENERATOR</button>
+            <button class="tab-btn" onclick="switchTab('audit-tab', this)">🛡️ SECURITY AUDIT</button>
+            <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ BACKUP & SETTINGS</button>
+        </nav>
+
+        <!-- TAB CONTENT CONTAINER -->
+        <main class="tab-content">
+
+            <!-- TAB 1: CREDENTIALS VAULT -->
+            <section id="vault-tab" class="tab-pane active">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Search credentials by website, username or category..." oninput="filterVault()">
+                    </div>
+                    <button class="cyber-button btn-cyan" onclick="openAddModal()">+ ADD CREDENTIAL</button>
+                </div>
+
+                <div class="table-container cyber-card">
+                    <table class="cyber-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>WEBSITE / SERVICE</th>
+                                <th>ENCRYPTED USERNAME</th>
+                                <th>CATEGORY</th>
+                                <th>STRENGTH</th>
+                                <th>LAST UPDATED</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vault-tbody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 2: PASSWORD GENERATOR -->
+            <section id="generator-tab" class="tab-pane">
+                <div class="cyber-card panel-card">
+                    <h2 class="panel-title">QUANTUM CRYPTOGRAPHIC PASSWORD GENERATOR</h2>
+                    <p class="panel-subtitle">Generates entropy-driven passwords using browser's CSPRNG (window.crypto.getRandomValues).</p>
+
+                    <div class="gen-output-box">
+                        <input type="text" id="gen-output" readonly value="...">
+                        <button class="cyber-button btn-cyan btn-sm" onclick="copyGenPassword()">📋 COPY</button>
+                    </div>
+
+                    <div class="strength-meter-box">
+                        <div class="meter-bar-bg">
+                            <div id="meter-fill" class="meter-fill"></div>
+                        </div>
+                        <div id="strength-label" class="strength-label">SECURITY LEVEL: STRONG (85.4 bits entropy)</div>
+                    </div>
+
+                    <div class="generator-controls">
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>PASSWORD LENGTH:</span>
+                                <span id="length-val" class="length-display">18</span>
+                            </div>
+                            <input type="range" id="length-slider" min="6" max="64" value="18" oninput="onLengthChange(this.value)">
+                        </div>
+
+                        <div class="checkbox-grid">
+                            <label class="cyber-checkbox">
+                                <input type="checkbox" id="cb-upper" checked onchange="generateNewPassword()">
+                                <span class="checkmark"></span> A-Z (Uppercase)
+                            </label>
+                            <label class="cyber-checkbox">
+                                <input type="checkbox" id="cb-lower" checked onchange="generateNewPassword()">
+                                <span class="checkmark"></span> a-z (Lowercase)
+                            </label>
+                            <label class="cyber-checkbox">
+                                <input type="checkbox" id="cb-digits" checked onchange="generateNewPassword()">
+                                <span class="checkmark"></span> 0-9 (Numbers)
+                            </label>
+                            <label class="cyber-checkbox">
+                                <input type="checkbox" id="cb-symbols" checked onchange="generateNewPassword()">
+                                <span class="checkmark"></span> !@#$ (Symbols)
+                            </label>
+                            <label class="cyber-checkbox full-width">
+                                <input type="checkbox" id="cb-ambiguous" onchange="generateNewPassword()">
+                                <span class="checkmark"></span> Exclude Ambiguous (l, 1, O, 0)
+                            </label>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="cyber-button btn-cyan" onclick="generateNewPassword()">⚡ RE-GENERATE</button>
+                            <button class="cyber-button btn-blue" onclick="copyGenPassword()">📋 COPY TO CLIPBOARD</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: SECURITY AUDIT -->
+            <section id="audit-tab" class="tab-pane">
+                <div class="metrics-grid">
+                    <div class="metric-card cyan-border">
+                        <div class="metric-title">TOTAL CREDENTIALS</div>
+                        <div id="metric-total" class="metric-value">0</div>
+                    </div>
+                    <div class="metric-card red-border">
+                        <div class="metric-title">WEAK PASSWORDS</div>
+                        <div id="metric-weak" class="metric-value">0</div>
+                    </div>
+                    <div class="metric-card amber-border">
+                        <div class="metric-title">REUSED PASSWORDS</div>
+                        <div id="metric-reused" class="metric-value">0</div>
+                    </div>
+                    <div class="metric-card green-border">
+                        <div class="metric-title">VAULT HEALTH</div>
+                        <div id="metric-score" class="metric-value">100%</div>
+                    </div>
+                </div>
+
+                <div class="cyber-card panel-card">
+                    <h2 class="panel-title">REAL-TIME VAULT VULNERABILITY ANALYSIS</h2>
+                    <textarea id="audit-report" class="audit-textarea" readonly></textarea>
+                    <button class="cyber-button btn-cyan" onclick="runAuditScan()" style="margin-top: 15px;">🔄 RUN VAULT AUDIT SCAN</button>
+                </div>
+            </section>
+
+            <!-- TAB 4: BACKUP & SETTINGS -->
+            <section id="settings-tab" class="tab-pane">
+                <div class="cyber-card panel-card">
+                    <h2 class="panel-title">BACKUP & VAULT MANAGEMENT</h2>
+                    <p class="panel-subtitle">Export or restore Web-Crypto encrypted backups across devices.</p>
+
+                    <div class="settings-box cyan-box">
+                        <h3>🔒 ENCRYPTED PORTABLE VAULT (.cybervault)</h3>
+                        <p>Exports all credentials into an encrypted JSON bundle derived using Web-Crypto AES-256-GCM.</p>
+                        <div class="btn-group">
+                            <button class="cyber-button btn-cyan" onclick="exportEncryptedBackup()">EXPORT ENCRYPTED BACKUP</button>
+                            <button class="cyber-button btn-blue" onclick="importEncryptedBackup()">RESTORE ENCRYPTED BACKUP</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-box amber-box">
+                        <h3>📄 UNENCRYPTED CSV IMPORT / EXPORT</h3>
+                        <p class="text-warning">Warning: Plain CSV exports contain unencrypted credentials in plaintext!</p>
+                        <div class="btn-group">
+                            <button class="cyber-button btn-amber" onclick="exportCSV()">EXPORT CSV</button>
+                            <button class="cyber-button btn-blue" onclick="importCSV()">IMPORT CSV</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ADD/EDIT CREDENTIAL MODAL -->
+    <div id="cred-modal" class="gateway-overlay hidden">
+        <div class="cyber-card modal-card">
+            <h2 id="modal-title" class="panel-title">ADD NEW CREDENTIAL</h2>
+            <form id="cred-form" onsubmit="saveCredential(event)">
+                <input type="hidden" id="edit-id">
+                
+                <div class="form-group">
+                    <label for="cred-website">WEBSITE / SERVICE:</label>
+                    <input type="text" id="cred-website" required placeholder="e.g. github.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="cred-username">USERNAME / EMAIL:</label>
+                    <input type="text" id="cred-username" required placeholder="user@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="cred-password">PASSWORD:</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="cred-password" required placeholder="••••••••••••">
+                        <button type="button" class="btn-toggle-eye" onclick="toggleCredEye()">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cred-category">CATEGORY:</label>
+                    <select id="cred-category">
+                        <option value="General">General</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Banking / Finance">Banking / Finance</option>
+                        <option value="Work">Work</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cred-notes">NOTES / EXTRA:</label>
+                    <input type="text" id="cred-notes" placeholder="Optional notes...">
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button type="submit" class="cyber-button btn-cyan">SAVE CREDENTIAL</button>
+                    <button type="button" class="cyber-button btn-red" onclick="closeCredModal()">CANCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" class="hidden" accept=".json,.cybervault,.csv">
+
+    <script src="app.js"></script>
+</body>
+</html>
